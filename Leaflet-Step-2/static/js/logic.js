@@ -99,8 +99,20 @@ function createMap(earthquakes, faultlineData) {
     // Create an overlay object
     var overlayMaps = {
         "Fault Lines": faultlineLayer,
-        "Earthquakes": earthquakeLayer
+        "Earthquakes": earthquakelayer
     };
+
+    // Create a map object
+    var myMap = L.map("map", {
+        center: [15.5994, -28.6731],
+        zoom: 2,
+        layers: [satellitemap, earthquakelayer, faultlineLayer]
+    });
+    // Pass our map layers into our layer control
+    // Add the layer control to the map
+    L.control.layers(baseMaps, overlayMaps, {
+        collapsed: false
+    }).addTo(myMap);
 
     // Display legend at bottom right corner of the map
     var legend = L.control({ position: 'bottomright' });
