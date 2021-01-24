@@ -90,6 +90,18 @@ function createMap(earthquakes, faultlineData) {
         accessToken: API_KEY
     });
 
+    // Create a baseMaps object
+    var baseMaps = {
+        "Satellite": satellitemap,
+        "Grayscale": darkmap,
+        "Outdoors": outdoormap
+    };
+    // Create an overlay object
+    var overlayMaps = {
+        "Fault Lines": faultlineLayer,
+        "Earthquakes": earthquakeLayer
+    };
+
     // Display legend at bottom right corner of the map
     var legend = L.control({ position: 'bottomright' });
     legend.onAdd = function (myMap) {
