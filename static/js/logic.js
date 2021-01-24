@@ -62,7 +62,7 @@ function createMap(earthquakes) {
                 fillColor: getColor(feature.properties.mag),
                 color: "black",
                 weight: 1,
-                opacity: 1,
+                opacity: 0.75,
                 fillOpacity: 0.65
             });
         },
