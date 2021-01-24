@@ -63,7 +63,7 @@ function createMap(earthquakes) {
                 color: "black",
                 weight: 1,
                 opacity: 1,
-                fillOpacity: 0.75
+                fillOpacity: 0.65
             });
         },
         onEachFeature: onEachFeature
