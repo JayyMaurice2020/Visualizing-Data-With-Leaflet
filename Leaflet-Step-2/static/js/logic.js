@@ -6,10 +6,10 @@
 function getColor(magnitude) {
     return magnitude >= 5 ? '#253494' :
         magnitude >= 4 ? '#2c7fb8' :
-        magnitude >= 3 ? '#41b6c4' :
-        magnitude >= 2 ? '#7fcdbb' :
-        magnitude >= 1 ? '#c7e9b4' :
-        '#ffffcc';
+            magnitude >= 3 ? '#41b6c4' :
+                magnitude >= 2 ? '#7fcdbb' :
+                    magnitude >= 1 ? '#c7e9b4' :
+                        '#ffffcc';
 }
 
 // Returns radius based on magnitude
@@ -22,16 +22,20 @@ function getEarthquakeData() {
 
     // URL to get the GeoJSON information for "All Earthquakes in Past 7 Days"
     url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+    faultlineUrl = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
 
     // Retrieve earthquake data
-    d3.json(url, function(earthquakeData) {
-        // Sending our earthquakes data to the createMap function
-        createMap(earthquakeData.features);
+    d3.json(url, function (earthquakeData) {
+        d3.json(faultlineUrl, function (faultlineData) {
+            // Sending our earthquakes data to the createMap function
+            createMap(earthquakeData.features, faultlineData.features);
+        });
+
     });
 }
 
 // Creates map with earthquake data
-function createMap(earthquakes) {
+function createMap(earthquakes, faultlineData) {
 
     // Defining information to be displayed on clicking the markers on the map
     function onEachFeature(feature, layer) {
@@ -39,24 +43,11 @@ function createMap(earthquakes) {
             "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
     }
 
-    // Create a map object
-    var myMap = L.map("map", {
-        center: [15.5994, -28.6731],
-        zoom: 2
-    });
-
-    L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-        attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-        tileSize: 512,
-        maxZoom: 20,
-        zoomOffset: -1,
-        id: "mapbox/streets-v11",
-        accessToken: API_KEY
-    }).addTo(myMap);
+    
 
     // Creating a GeoJSON layer with the retrieved data
-    L.geoJSON(earthquakes, {
-        pointToLayer: function(feature, latlng) {
+    var earthquakelayer = L.geoJSON(earthquakes, {
+        pointToLayer: function (feature, latlng) {
             return L.circleMarker(latlng, {
                 radius: getRadius(feature.properties.mag),
                 fillColor: getColor(feature.properties.mag),
@@ -69,9 +60,13 @@ function createMap(earthquakes) {
         onEachFeature: onEachFeature
     }).addTo(myMap);
 
+    var faultlineLayer = L.geoJSON(faultlineData, {
+        color: "#fba200"
+    }) 
+
     // Display legend at bottom right corner of the map
     var legend = L.control({ position: 'bottomright' });
-    legend.onAdd = function(myMap) {
+    legend.onAdd = function (myMap) {
 
         var div = L.DomUtil.create('div', 'info legend'),
             mags = [0, 1, 2, 3, 4, 5];
